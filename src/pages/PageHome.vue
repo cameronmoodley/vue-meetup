@@ -9,7 +9,13 @@
           <button class="button is-primary is-pulled-right m-r-sm">
             Create Meetups
           </button>
-          <button class="button is-primary is-pulled-right m-r-sm">All</button>
+
+          <router-link
+            class="button is-primary is-pulled-right m-r-sm"
+            :to="'/find'"
+          >
+            All
+          </router-link>
         </div>
         <div class="row columns is-multiline">
           <!-- thing here -->
@@ -55,7 +61,6 @@ export default {
       .all([axios.get('/api/v1/meetups'), axios.get('/api/v1/categories')])
       .then(
         axios.spread((meetups, categories) => {
-          console.log(meetups.data)
           this.meetups = meetups.data
           this.categories = categories.data
         })
