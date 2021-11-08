@@ -22,7 +22,6 @@ export default {
 
 <style lang="css">
 @import "assets/css/spacing.css";
-@import "~bulma/bulma.sass";
 
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
