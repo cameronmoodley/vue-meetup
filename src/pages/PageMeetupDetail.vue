@@ -158,33 +158,25 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
+import { mapActions, mapState } from 'vuex'
 export default {
-  data() {
-    return {
-      meetup: {},
-      threads: []
-    }
-  },
-  async created() {
-    const meetupId = this.$route.params.id
-
-    axios
-      .all([
-        axios.get(`/api/v1/meetups/${meetupId}`),
-        axios.get(`/api/v1/threads?meetupId=${meetupId}`)
-      ])
-      .then(
-        axios.spread((meetup, threads) => {
-          this.meetup = meetup.data
-          this.threads = threads.data
-        })
-      )
-  },
   computed: {
     meetupCreator() {
-      return this.meetup.meetupCreator || ''
-    }
+      return this.meetup.meetupCreator || {}
+    },
+
+    ...mapState({
+      meetup: (state) => state.meetup,
+      threads: (state) => state.threads
+    })
+  },
+  created() {
+    const meetupId = this.$route.params.id
+    this.fetchSingleMeetup(meetupId)
+    this.fetchThreads(meetupId)
+  },
+  methods: {
+    ...mapActions(['fetchSingleMeetup', 'fetchThreads'])
   }
 }
 </script>
@@ -234,13 +226,12 @@ export default {
   font-size: 16px;
   padding: 15px;
 }
-
-/* > p,
-    h1,
-    h2,
-    strong {
-      color: white;
-    } */
+.meetup-detail-page > p,
+h1,
+h2,
+strong {
+  color: white;
+}
 
 pre,
 .message {

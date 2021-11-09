@@ -44,27 +44,24 @@
 </template>
 
 <script>
-import axios from 'axios'
 import CategoryItemVue from '../components/CategoryItem.vue'
 import MeetupItem from '../components/MeetupItem.vue'
+import { mapActions, mapState } from 'vuex'
 export default {
   components: { CategoryItemVue, MeetupItem },
-  data() {
-    return {
-      meetups: [],
-      categories: []
-    }
+  computed: {
+    ...mapState({
+      meetups: (state) => state.meetups,
+      categories: (state) => state.categories
+    })
   },
-
   created() {
-    axios
-      .all([axios.get('/api/v1/meetups'), axios.get('/api/v1/categories')])
-      .then(
-        axios.spread((meetups, categories) => {
-          this.meetups = meetups.data
-          this.categories = categories.data
-        })
-      )
+    this.fetchMeetups()
+    this.fetchCategories()
+  },
+  methods: {
+    // maps functions to context of component
+    ...mapActions(['fetchMeetups', 'fetchCategories'])
   }
 }
 </script>

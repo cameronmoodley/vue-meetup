@@ -42,12 +42,12 @@
             >
               <div class="meetup-card-find-content">
                 <div class="meetup-card-find-content-date is-pulled-right">
-                  <span class="month">{{
-                    meetup.startDate | formatDate('MMM')
-                  }}</span>
-                  <span class="day">{{
-                    meetup.startDate | formatDate('D')
-                  }}</span>
+                  <span class="month">
+                    {{ meetup.startDate | formatDate('MMM') }}
+                  </span>
+                  <span class="day">
+                    {{ meetup.startDate | formatDate('D') }}
+                  </span>
                 </div>
                 <div class="meetup-card-find-content-info">
                   <p class="title is-4 no-padding is-marginless m-b-xs">
@@ -66,27 +66,28 @@
           </div>
         </div>
         <div>
-          <span class="tag is-warning is-large"
-            >No meetups found :( You might try to change search criteria
-            (:</span
-          >
+          <span class="tag is-warning is-large">
+            No meetups found :( You might try to change search criteria(:
+          </span>
         </div>
       </section>
     </div>
   </div>
 </template>
 <script>
-import axios from 'axios'
+import { mapActions, mapState } from 'vuex'
 export default {
-  data() {
-    return {
-      meetups: []
-    }
+  //watches for changes on a variable and updates state
+  computed: {
+    ...mapState({
+      meetups: (state) => state.meetups
+    })
   },
   created() {
-    axios.get('/api/v1/meetups').then((res) => {
-      this.meetups = res.data
-    })
+    this.fetchMeetups()
+  },
+  methods: {
+    ...mapActions(['fetchMeetups'])
   }
 }
 </script>
