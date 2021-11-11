@@ -72,7 +72,19 @@
                     type="text"
                     placeholder="Avatar"
                     autocomplete=""
+                    @blur="$v.form.avatar.$touch()"
                   />
+                </div>
+                <div v-if="$v.form.avatar.$error" class="form-error">
+                  <span v-if="!$v.form.avatar.url" class="help is-danger">
+                    Please provide a correct URL format
+                  </span>
+                  <span
+                    v-if="!$v.form.avatar.supportedFileType"
+                    class="help is-danger"
+                  >
+                    Please provide a correct file type
+                  </span>
                 </div>
               </div>
               <div class="field">
@@ -159,6 +171,8 @@ import {
   url,
   sameAs
 } from 'vuelidate/lib/validators'
+
+import { supportedFileType } from '@/helpers/validators'
 export default {
   data() {
     return {
@@ -181,6 +195,10 @@ export default {
       email: {
         required,
         email
+      },
+      avatar: {
+        url,
+        supportedFileType
       },
       password: {
         required,
