@@ -1,44 +1,49 @@
 <template>
   <div>
-    <AppHero />
-    <div class="container">
-      <section class="section">
-        <div class="m-b-lg">
-          <h1 class="title is-inline">Featured Meetups in "Location"</h1>
-          <AppDropdown />
-          <button class="button is-primary is-pulled-right m-r-sm">
-            Create Meetups
-          </button>
+    <div>
+      <AppHero />
+      <div v-if="pageLoader_resolveData" class="container">
+        <section class="section">
+          <div class="m-b-lg">
+            <h1 class="title is-inline">Featured Meetups in "Location"</h1>
+            <AppDropdown />
+            <button class="button is-primary is-pulled-right m-r-sm">
+              Create Meetups
+            </button>
 
-          <router-link
-            class="button is-primary is-pulled-right m-r-sm"
-            :to="'/find'"
-          >
-            All
-          </router-link>
-        </div>
-        <div class="row columns is-multiline">
-          <!-- thing here -->
-          <MeetupItem
-            v-for="meetup in meetups"
-            :key="meetup._id"
-            :meetup="meetup"
-          />
-        </div>
-      </section>
-      <section class="section">
-        <div>
-          <h1 class="title">Categories</h1>
-          <div class="columns cover is-multiline is-mobile">
-            <!-- <--Category Comes here -->
-            <CategoryItemVue
-              v-for="category in categories"
-              :key="category._id"
-              :category="category"
+            <router-link
+              class="button is-primary is-pulled-right m-r-sm"
+              :to="'/find'"
+            >
+              All
+            </router-link>
+          </div>
+          <div class="row columns is-multiline">
+            <!-- thing here -->
+            <MeetupItem
+              v-for="meetup in meetups"
+              :key="meetup._id"
+              :meetup="meetup"
             />
           </div>
-        </div>
-      </section>
+        </section>
+        <section class="section">
+          <div>
+            <h1 class="title">Categories</h1>
+            <div class="columns cover is-multiline is-mobile">
+              <!-- <--Category Comes here -->
+              <CategoryItemVue
+                v-for="category in categories"
+                :key="category._id"
+                :category="category"
+              />
+            </div>
+          </div>
+        </section>
+      </div>
+      <div v-else class="container">
+        <AppSpinner />
+      </div>
     </div>
   </div>
 </template>
@@ -47,21 +52,30 @@
 import CategoryItemVue from '../components/CategoryItem.vue'
 import MeetupItem from '../components/MeetupItem.vue'
 import { mapActions, mapState } from 'vuex'
+import pageLoader from '@/mixins/pageLoad'
 export default {
   components: { CategoryItemVue, MeetupItem },
+  mixins: [pageLoader],
+  data() {
+    return {
+      isDataLoaded: false
+    }
+  },
   computed: {
     ...mapState({
-      meetups: (state) => state.meetups,
-      categories: (state) => state.categories
+      meetups: (state) => state.meetups.items,
+      categories: (state) => state.categories.items
     })
   },
-  created() {
-    this.fetchMeetups()
-    this.fetchCategories()
+  async created() {
+    await this.fetchMeetups()
+    await this.fetchCategories()
+    this.pageLoader_resolveData()
   },
   methods: {
     // maps functions to context of component
-    ...mapActions(['fetchMeetups', 'fetchCategories'])
+    ...mapActions('meetups', ['fetchMeetups']),
+    ...mapActions('categories', ['fetchCategories'])
   }
 }
 </script>

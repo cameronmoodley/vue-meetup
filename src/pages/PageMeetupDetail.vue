@@ -161,14 +161,13 @@
 import { mapActions, mapState } from 'vuex'
 export default {
   computed: {
+    ...mapState({
+      meetup: (state) => state.meetups.item,
+      threads: (state) => state.threads.items
+    }),
     meetupCreator() {
       return this.meetup.meetupCreator || {}
-    },
-
-    ...mapState({
-      meetup: (state) => state.meetup,
-      threads: (state) => state.threads
-    })
+    }
   },
   created() {
     const meetupId = this.$route.params.id
@@ -176,7 +175,8 @@ export default {
     this.fetchThreads(meetupId)
   },
   methods: {
-    ...mapActions(['fetchSingleMeetup', 'fetchThreads'])
+    ...mapActions('meetups', ['fetchSingleMeetup']),
+    ...mapActions('threads', ['fetchThreads'])
   }
 }
 </script>

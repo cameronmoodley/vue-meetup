@@ -75,19 +75,15 @@
   </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
 export default {
   //watches for changes on a variable and updates state
   computed: {
-    ...mapState({
-      meetups: (state) => state.meetups
-    })
+    meetups() {
+      return this.$store.state.meetups.items
+    }
   },
   created() {
-    this.fetchMeetups()
-  },
-  methods: {
-    ...mapActions(['fetchMeetups'])
+    this.$store.dispatch('meetups/fetchMeetups')
   }
 }
 </script>
