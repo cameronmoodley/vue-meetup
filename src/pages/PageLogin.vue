@@ -100,9 +100,14 @@ export default {
     }
   },
   methods: {
-    login() {
+    async login() {
       this.$v.form.$touch()
-      this.$store.dispatch('auth/loginWithEmailAndPassword', this.form)
+      try {
+        await this.$store.dispatch('auth/loginWithEmailAndPassword', this.form)
+        this.$router.push('/')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }

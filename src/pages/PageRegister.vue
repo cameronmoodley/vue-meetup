@@ -216,9 +216,14 @@ export default {
     }
   },
   methods: {
-    register() {
+    async register() {
       this.$v.form.$touch()
-      this.$store.dispatch('auth/registerUser', this.form)
+      try {
+        await this.$store.dispatch('auth/registerUser', this.form)
+        this.$router.push('/login')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }
