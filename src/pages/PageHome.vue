@@ -7,9 +7,13 @@
           <div class="m-b-lg">
             <h1 class="title is-inline">Featured Meetups in "Location"</h1>
             <AppDropdown />
-            <button class="button is-primary is-pulled-right m-r-sm">
+            <router-link
+              class="button is-primary is-pulled-right m-r-sm"
+              :to="{ name: 'PageMeetupCreate' }"
+              v-if="user"
+            >
               Create Meetups
-            </button>
+            </router-link>
 
             <router-link
               class="button is-primary is-pulled-right m-r-sm"
@@ -51,7 +55,7 @@
 <script>
 import CategoryItemVue from '../components/CategoryItem.vue'
 import MeetupItem from '../components/MeetupItem.vue'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import pageLoader from '@/mixins/pageLoad'
 export default {
   components: { CategoryItemVue, MeetupItem },
@@ -62,6 +66,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({ user: 'auth/authUser' }),
     ...mapState({
       meetups: (state) => state.meetups.items,
       categories: (state) => state.categories.items

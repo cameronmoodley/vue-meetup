@@ -4,7 +4,7 @@
     <div class="card large">
       <!-- this is better than the one above because it allows you to the URL -->
       <router-link
-        :to="{ name: 'PageMeetUpDetail', params: { id: meetup._id } }"
+        :to="{ name: 'PageMeetupDetail', params: { id: meetup._id } }"
         class="card-meetup-link"
       >
         <div class="card-image">
