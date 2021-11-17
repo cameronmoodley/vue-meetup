@@ -18,8 +18,7 @@
             <div class="media-content">
               <div class="content">
                 <p>
-                  Created by
-                  <strong>{{ meetupCreator.name }}</strong>
+                  Created by <strong>{{ meetupCreator.name }}</strong>
                 </p>
               </div>
             </div>
@@ -43,8 +42,7 @@
                 </div>
                 <div class="meetup-side-box-date m-b-sm">
                   <p><b>Time</b></p>
-                  <span> {{ meetup.timeFrom }}</span>
-                  -
+                  <span>{{ meetup.timeFrom }}</span> -
                   <span>{{ meetup.timeTo }}</span>
                 </div>
                 <div class="meetup-side-box-place m-b-sm">
@@ -58,7 +56,7 @@
               </div>
               <div class="meetup-side-box-map">
                 <img
-                  src="https://snazzy-maps-cdn.azureedge.net/assets/8097-wy.png?v=20170626083314"
+                  src="https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/pass/GoogleMapTA.jpg"
                   class="venueMap-mapImg span--100"
                   alt="Location image of meetup venue"
                 />
@@ -89,9 +87,7 @@
           <div class="column is-7 is-offset-1">
             <div class="content is-medium">
               <h3 class="title is-3">About the Meetup</h3>
-              <p>
-                {{ meetup.description }}
-              </p>
+              <p>{{ meetup.description }}</p>
               <!-- Join Meetup, We will handle it later (: -->
               <button class="button is-primary">Join In</button>
               <!-- Not logged In Case, handle it later (: -->
@@ -103,9 +99,7 @@
               <h3 class="title is-3">Threads</h3>
               <div v-for="thread in threads" :key="thread._id" class="box">
                 <!-- Thread title -->
-                <h4 id="const" class="title is-3">
-                  {{ thread.title }}
-                </h4>
+                <h4 id="const" class="title is-3">{{ thread.title }}</h4>
                 <!-- Create new post, handle later -->
                 <form class="post-create">
                   <div class="field">
@@ -157,26 +151,29 @@
     </section>
   </div>
 </template>
+
 <script>
-import { mapActions, mapState } from 'vuex'
+import axios from 'axios'
 export default {
+  data() {
+    return {
+      meetup: {},
+      threads: []
+    }
+  },
   computed: {
-    ...mapState({
-      meetup: (state) => state.meetups.item,
-      threads: (state) => state.threads.items
-    }),
     meetupCreator() {
-      return this.meetup.meetupCreator || {}
+      return this.meetup.meetupCreator || ''
     }
   },
   created() {
     const meetupId = this.$route.params.id
-    this.fetchSingleMeetup(meetupId)
-    this.fetchThreads(meetupId)
-  },
-  methods: {
-    ...mapActions('meetups', ['fetchSingleMeetup']),
-    ...mapActions('threads', ['fetchThreads'])
+    axios.get(`/api/v1/meetups/${meetupId}`).then((res) => {
+      this.meetup = res.data
+    })
+    axios.get(`/api/v1/threads?meetupId=${meetupId}`).then((res) => {
+      this.threads = res.data
+    })
   }
 }
 </script>
@@ -214,7 +211,7 @@ export default {
   border: 1px solid rgba(46, 62, 72, 0.12);
   color: white;
   background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-    url('https://images.unsplash.com/photo-1531263060782-b024de9b9793?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80');
+    url('http://images.unsplash.com/photo-1531263060782-b024de9b9793?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80');
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;

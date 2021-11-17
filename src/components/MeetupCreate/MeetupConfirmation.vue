@@ -5,39 +5,39 @@
     <div class="content">
       <div>
         <span class="result-title"> Location </span>
-        <p>Some Location</p>
+        <p>{{ meetup.location }}</p>
       </div>
       <div>
         <span class="result-title"> Title </span>
-        <p>Some Title</p>
+        <p>{{ meetup.title }}</p>
       </div>
       <div>
         <span class="result-title"> Start Date </span>
-        <p>Some Start Date</p>
+        <p>{{ meetup.startDate }}</p>
       </div>
       <div>
         <span class="result-title"> From </span>
-        <p>Some Time From</p>
+        <p>{{ meetup.timeFrom }}</p>
       </div>
       <div>
         <span class="result-title"> To </span>
-        <p>Some Time To</p>
+        <p>{{ meetup.timeTo }}</p>
       </div>
       <div>
         <span class="result-title"> Category </span>
-        <p>Some Category</p>
+        <p>{{ meetup.category.name }}</p>
       </div>
       <div>
         <span class="result-title"> Image </span>
-        <p>Some Event</p>
+        <p>{{ meetup.image }}</p>
       </div>
       <div>
         <span class="result-title"> Short Info </span>
-        <p>Some Info</p>
+        <p>{{ meetup.shortInfo }}</p>
       </div>
       <div>
         <span class="result-title"> Description </span>
-        <p>Some Description</p>
+        <p>{{ meetup.description }}</p>
       </div>
     </div>
   </div>
@@ -45,7 +45,12 @@
 
 <script>
 export default {
-  validations: {}
+  props: {
+    meetup: {
+      required: true,
+      type: Object
+    }
+  }
 }
 </script>
 

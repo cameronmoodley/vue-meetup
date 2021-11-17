@@ -3,7 +3,7 @@
     <AppHero />
     <section class="section">
       <div class="container">
-        <MeetupCreateWizard />
+        <MeetupCreateWizard @meetupConfirmed="createMeetup" />
       </div>
     </section>
   </div>
@@ -14,11 +14,31 @@ import MeetupCreateWizard from '@/components/MeetupCreate/MeetupCreateWizard'
 export default {
   components: {
     MeetupCreateWizard
+  },
+  computed: {
+    categories() {
+      return this.$store.state.categories.items
+    }
+  },
+  created() {
+    if (this.categories.length === 0) {
+      this.$store.dispatch('categories/fetchCategories')
+    }
+  },
+  methods: {
+    createMeetup(meetupToCreate) {
+      this.$store
+        .dispatch('meetups/createMeetup', meetupToCreate)
+        .then((createdMeetup) => {
+          this.$router.push(`/meetups/${createdMeetup._id}`)
+        })
+        .catch((err) => console.log(err))
+    }
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="css">
 .meetup-create-page {
   min-height: 100vh;
 }

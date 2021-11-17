@@ -1,5 +1,5 @@
 <template>
-  <form class="m-b-md">
+  <form class="m-b-md" @input="emitFormData">
     <div class="field">
       <label class="title">Image</label>
       <input
@@ -7,6 +7,7 @@
         class="input"
         type="text"
         placeholder="Image URL"
+        @blur="$v.form.image.$touch()"
       />
       <div v-if="$v.form.image.$error">
         <span v-if="!$v.form.image.required" class="help is-danger">
@@ -21,6 +22,7 @@
         class="textarea"
         placeholder="Write Short Info"
         rows="3"
+        @blur="$v.form.shortInfo.$touch()"
       ></textarea>
       <div v-if="$v.form.shortInfo.$error">
         <span v-if="!$v.form.shortInfo.required" class="help is-danger">
@@ -35,6 +37,7 @@
         class="textarea"
         placeholder="Write description"
         rows="10"
+        @blur="$v.form.description.$touch()"
       ></textarea>
       <div v-if="$v.form.description.$error">
         <span v-if="!$v.form.description.required" class="help is-danger">
@@ -68,6 +71,11 @@ export default {
       description: {
         required
       }
+    }
+  },
+  methods: {
+    emitFormData() {
+      this.$emit('stepUpdated', { data: this.form, isValid: !this.$v.$invalid })
     }
   }
 }
