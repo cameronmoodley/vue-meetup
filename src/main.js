@@ -7,6 +7,7 @@ import vuelidate from 'vuelidate'
 import AppDropdown from './components/shared/AppDropdown'
 import AppHero from './components/shared/AppHero'
 import AppSpinner from './components/shared/AppSpinner'
+import Toasted from 'vue-toasted'
 
 import moment from 'moment'
 
@@ -17,6 +18,7 @@ Vue.component('AppDropdown', AppDropdown)
 Vue.component('AppSpinner', AppSpinner)
 
 Vue.use(vuelidate)
+Vue.use(Toasted)
 
 Vue.filter('capitalize', function (value) {
   if (typeof value === 'string') {

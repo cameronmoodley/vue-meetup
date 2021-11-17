@@ -11,17 +11,19 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
     meetups,
-    threads,
     categories,
+    threads,
     auth
   },
-  // Simple functions to mutate state
   mutations: {
-    setItems(state, { resource, data }) {
-      state[resource].items = data
+    setItems(state, { resource, items }) {
+      state[resource].items = items
     },
-    setItem(state, { resource, data }) {
-      state[resource].item = data
+    setItem(state, { resource, item }) {
+      state[resource].item = item
+    },
+    addItemToArray(state, { item, index, resource }) {
+      Vue.set(state[resource].items, index, item)
     }
   }
 })
