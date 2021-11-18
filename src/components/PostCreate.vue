@@ -5,19 +5,52 @@
     <!-- <div v-with-warning:red.prevent="'What a nice day :)'"></div> -->
     <div class="field">
       <textarea
+        v-model="text"
+        v-auto-expand
         class="textarea textarea-post"
         placeholder="Write a post"
         rows="1"
       ></textarea>
-      <button :disabled="true" class="button is-primary m-t-sm">Send</button>
+      <button
+        :disabled="!text"
+        class="button is-primary m-t-sm"
+        @click.prevent="sendPost"
+      >
+        Send
+      </button>
     </div>
   </form>
   <!-- Create new post END, handle later -->
 </template>
 <script>
-import withWarning from '@/directives/withWarning.js'
+import autoExpand from '@/directives/autoExpand'
+
 export default {
-  directives: { withWarning }
+  directives: { autoExpand },
+  props: {
+    threadId: {
+      required: true,
+      type: String
+    }
+  },
+
+  data() {
+    return {
+      text: null
+    }
+  },
+  methods: {
+    sendPost() {
+      this.$store
+        .dispatch('threads/sendPost', {
+          text: this.text,
+          thread: this.threadId
+        })
+        .then(() => {
+          this.text = ''
+        })
+    }
+  }
 }
 </script>
 <style scoped></style>
