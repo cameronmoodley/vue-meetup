@@ -11,6 +11,8 @@ import Toasted from 'vue-toasted'
 
 import moment from 'moment'
 
+import AppSocket from '@/plugins/socket'
+
 Vue.config.productionTip = false
 
 Vue.component('AppHero', AppHero)
@@ -19,6 +21,7 @@ Vue.component('AppSpinner', AppSpinner)
 
 Vue.use(vuelidate)
 Vue.use(Toasted)
+Vue.use(AppSocket, { connection: 'http://localhost:3001' })
 
 Vue.filter('capitalize', function (value) {
   if (typeof value === 'string') {
