@@ -173,7 +173,7 @@ export default {
   },
   destroyed() {
     this.$socket.removeListener('meetup/postPublished', this.addPostToThread)
-    this.$socket.emit('meetup/unsubscribe')
+    this.$socket.emit('meetup/unsubscribe', this.meetup._id)
   },
   methods: {
     ...mapActions('meetups', ['fetchMeetupById']),
