@@ -124,6 +124,7 @@ export default {
 
   computed: {
     categories() {
+      console.log(this.$store.state)
       return this.$store.state.categories.items
     }
   },

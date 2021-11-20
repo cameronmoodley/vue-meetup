@@ -7,10 +7,19 @@
           <div class="level">
             <div class="level-left">
               <div class="level-item">
-                <input type="text" class="input" placeholder="New York" />
+                <input
+                  v-model="searchedLocation"
+                  type="text"
+                  class="input"
+                  placeholder="New York"
+                  @keyup.enter="fetchMeetups"
+                />
               </div>
-              <div class="level-item">
-                <span>Meetups in New York, USA</span>
+              <div
+                v-if="searchedLocation && meetups && meetups.length > 0"
+                class="level-item"
+              >
+                <span>Meetups in {{ meetups[0].location }}</span>
               </div>
             </div>
             <div class="level-right">
@@ -25,7 +34,10 @@
     </div>
     <div class="container">
       <section class="section page-find">
-        <div class="columns cover is-multiline">
+        <div
+          v-if="meetups && meetups.length > 0"
+          class="columns cover is-multiline"
+        >
           <div
             v-for="meetup of meetups"
             :key="meetup._id"
@@ -42,12 +54,12 @@
             >
               <div class="meetup-card-find-content">
                 <div class="meetup-card-find-content-date is-pulled-right">
-                  <span class="month">
-                    {{ meetup.startDate | formatDate('MMM') }}
-                  </span>
-                  <span class="day">
-                    {{ meetup.startDate | formatDate('D') }}
-                  </span>
+                  <span class="month">{{
+                    meetup.startDate | formatDate('MMM')
+                  }}</span>
+                  <span class="day">{{
+                    meetup.startDate | formatDate('D')
+                  }}</span>
                 </div>
                 <div class="meetup-card-find-content-info">
                   <p class="title is-4 no-padding is-marginless m-b-xs">
@@ -65,25 +77,42 @@
             </router-link>
           </div>
         </div>
-        <div>
+        <div v-else>
           <span class="tag is-warning is-large">
-            No meetups found :( You might try to change search criteria(:
+            No meetups found :( You might try to change search criteria (:
           </span>
         </div>
       </section>
     </div>
   </div>
 </template>
+
 <script>
 export default {
-  //watches for changes on a variable and updates state
+  data() {
+    return {
+      searchedLocation: this.$store.getters['meta/location'],
+      filter: {}
+    }
+  },
   computed: {
     meetups() {
       return this.$store.state.meetups.items
     }
   },
   created() {
-    this.$store.dispatch('meetups/fetchMeetups')
+    this.fetchMeetups()
+  },
+  methods: {
+    fetchMeetups() {
+      if (this.searchedLocation) {
+        this.filter['location'] = this.searchedLocation
+          .toLowerCase()
+          .replace(/[\s,]+/g, '')
+          .trim()
+      }
+      this.$store.dispatch('meetups/fetchMeetups', { filter: this.filter })
+    }
   }
 }
 </script>

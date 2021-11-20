@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAuthResolved" id="app">
+  <div v-if="isAuthResolved && isLocationResolved" id="app">
     <TheNavbar />
     <div class="page-wrapper">
       <router-view />
@@ -12,7 +12,6 @@
 import TheNavbar from '@/components/shared/TheNavbar'
 import TheFooter from '@/components/shared/TheFooter'
 export default {
-  name: 'App',
   components: {
     TheNavbar,
     TheFooter
@@ -20,7 +19,13 @@ export default {
   computed: {
     isAuthResolved() {
       return this.$store.state.auth.isAuthResolved
+    },
+    isLocationResolved() {
+      return this.$store.state.meta.isLocationResolved
     }
+  },
+  created() {
+    this.$store.dispatch('meta/fetchMetaData')
   }
 }
 </script>
