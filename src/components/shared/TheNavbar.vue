@@ -43,7 +43,9 @@
         <div v-if="user" class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link"> Account </a>
           <div class="navbar-dropdown">
-            <a href="#" class="navbar-item"> Profile </a>
+            <router-link class="navbar-item" :to="{ name: 'PageProfile' }">
+              Profile 
+            </router-link>
             <hr class="navbar-divider" />
             <a class="navbar-item" @click.prevent="logout"> Logout </a>
           </div>
