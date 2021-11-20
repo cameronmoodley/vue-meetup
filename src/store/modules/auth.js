@@ -56,16 +56,6 @@ export default {
         .catch((err) => rejectError(err))
     },
     logout({ commit }) {
-      // For Session Authnetication !
-      // return axios.post('/api/v1/users/logout')
-      //   .then(() => {
-      //     commit('setAuthUser', null)
-      //     return true
-      //   })
-      //   .catch(err => {
-      //     return err
-      //   })
-
       return new Promise((resolve) => {
         localStorage.removeItem('meetuper-jwt')
         commit('setAuthUser', null)
@@ -113,11 +103,20 @@ export default {
       )
       userMeetupsId.splice(index, 1)
       commit('setMeetupsToAuthUser', userMeetupsId)
+    },
+    updateUser({ commit }, user) {
+      axiosInstance
+        .patch(`/api/v1/users/${user._id}`, user)
+        .then(({ data }) => {
+          commit('setAuthUser', data)
+          return data
+        })
     }
   },
   mutations: {
     setAuthUser(state, user) {
       return (state.user = user)
+      // return Vue.set(state.auth, 'user', user)
     },
     setAuthState(state, authState) {
       return (state.isAuthResolved = authState)

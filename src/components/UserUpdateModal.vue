@@ -38,7 +38,9 @@
           </form>
         </section>
         <footer class="modal-card-foot">
-          <button class="button is-success">Save changes</button>
+          <button class="button is-success" @click.prevent="emitUser">
+            Save changes
+          </button>
           <button class="button" @click="isModalOpen = false">Cancel</button>
         </footer>
       </div>
@@ -57,6 +59,16 @@ export default {
     return {
       isModalOpen: false,
       user: { ...this.authUser }
+    }
+  },
+  methods: {
+    emitUser() {
+      this.$emit('userSubmitted', {
+        user: this.user,
+        done: () => {
+          this.isModalOpen = false
+        }
+      })
     }
   }
 }

@@ -15,7 +15,7 @@
               <!-- TODO: Display user name here -->
               <span class="title is-bold">{{ user.name }}</span>
               <br />
-              <UserUpdateModal :auth-user="user" />
+              <UserUpdateModal :auth-user="user" @userSubmitted="updateUser" />
               <br />
             </p>
             <!-- TODO: User Info Here if any -->
@@ -46,7 +46,7 @@
           <!-- TODO: Set Active Tab to 'posts' and class to 'isActive' -->
           <div
             :class="`stats-tab column is-2-tablet is-4-mobile has-text-centered ${
-              activeTab === 'threads' && 'isActive'
+              activeTab === 'posts' && 'isActive'
             }`"
             @click="changeTab('posts')"
           >
@@ -184,6 +184,17 @@ export default {
   methods: {
     changeTab(currentTab) {
       this.activeTab = currentTab
+    },
+    updateUser({ user, done }) {
+      this.$store
+        .dispatch('auth/updateUser', user)
+        .then(() => {
+          done()
+          this.$toasted.success('User Succesfuly Updated!', { duration: 3000 })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     }
   }
 }
