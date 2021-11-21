@@ -273,11 +273,9 @@ export default {
   font-size: 16px;
   padding: 15px;
 }
-.meetup-detail-page > p,
-h1,
-h2,
-strong {
-  color: white;
+
+.author {
+  color: black !important;
 }
 
 pre,

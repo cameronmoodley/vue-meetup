@@ -1,19 +1,27 @@
 <template>
   <div>
     <AppHero />
-    <div class="container">
+    <div v-if="pageLoader_isDataLoaded" class="container">
       <section class="section">
         <div class="m-b-lg">
-          <h1 class="title is-inline">Featured Meetups in "Location"</h1>
+          <h1 class="title is-inline">
+            Featured Meetups
+            <span v-if="ipLocation"> in {{ ipLocation }}</span>
+          </h1>
           <AppDropdown />
           <router-link
             v-if="user"
-            class="button is-primary is-pulled-right m-r-sm"
             :to="{ name: 'PageMeetupCreate' }"
+            class="button is-primary is-pulled-right m-r-sm"
           >
             Create Meetups
           </router-link>
-          <button class="button is-primary is-pulled-right m-r-sm">All</button>
+          <router-link
+            :to="{ name: 'PageMeetupFind' }"
+            class="button is-primary is-pulled-right m-r-sm"
+          >
+            All
+          </router-link>
         </div>
         <div class="row columns is-multiline">
           <!-- Iterate your meetups here! -->
@@ -37,37 +45,51 @@
         </div>
       </section>
     </div>
+    <div v-else class="container">
+      <AppSpinner />
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import CategoryItem from '@/components/CategoryItem'
 import MeetupItem from '@/components/MeetupItem'
-import { mapGetters } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
+import pageLoader from '@/mixins/pageLoader'
+import { processLocation } from '@/helpers'
+
 export default {
   components: {
     CategoryItem,
     MeetupItem
   },
-  data() {
-    return {
-      meetups: [],
-      categories: []
-    }
-  },
+  mixins: [pageLoader],
   computed: {
     ...mapGetters({
-      user: 'auth/authUser'
+      user: 'auth/authUser',
+      ipLocation: null
+    }),
+    ...mapState({
+      meetups: (state) => state.meetups.items,
+      categories: (state) => state.categories.items
     })
   },
   created() {
-    axios.get('/api/v1/meetups').then((res) => {
-      this.meetups = res.data
-    })
-    axios.get('/api/v1/categories').then((res) => {
-      this.categories = res.data
-    })
+    const filter = {}
+    if (this.ipLocation) {
+      filter['location'] = processLocation(this.ipLocation)
+    }
+
+    Promise.all([this.fetchMeetups({ filter }), this.fetchCategories()])
+      .then(() => this.pageLoader_resolveData())
+      .catch((err) => {
+        console.error(err)
+        this.pageLoader_resolveData()
+      })
+  },
+  methods: {
+    ...mapActions('meetups', ['fetchMeetups']),
+    ...mapActions('categories', ['fetchCategories'])
   }
 }
 </script>

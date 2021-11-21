@@ -1,23 +1,29 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const Meetup = require('./meetups');
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+const Meetup = require('./meetups')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const config = require('../config/dev')
+const config = require('../config/')
 
 const userSchema = new Schema({
   avatar: String,
-  email: { type: String,
-           required: 'Email is Required',
-           lowercase: true,
-           unique: true,
-           match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/]},
-  name: { type: String,
-          required: true,
-          minlength: [6, 'Too short, min is 6 characters']},
-  username: { type: String,
-          required: true,
-          minlength: [6, 'Too short, min is 6 characters']},
+  email: {
+    type: String,
+    required: 'Email is Required',
+    lowercase: true,
+    unique: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/]
+  },
+  name: {
+    type: String,
+    required: true,
+    minlength: [6, 'Too short, min is 6 characters']
+  },
+  username: {
+    type: String,
+    required: true,
+    minlength: [6, 'Too short, min is 6 characters']
+  },
   password: {
     type: String,
     minlength: [4, 'Too short, min is 4 characters'],
@@ -28,38 +34,47 @@ const userSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   joinedMeetups: [{ type: Schema.Types.ObjectId, ref: 'Meetup' }]
-});
+})
 
-userSchema.pre("save", function(next){
-   const user = this;
+userSchema.pre('save', function (next) {
+  const user = this
 
-   bcrypt.genSalt(10, function(err, salt) {
-      if(err){ return next(err);}
+  bcrypt.genSalt(10, function (err, salt) {
+    if (err) {
+      return next(err)
+    }
 
-      bcrypt.hash(user.password, salt, function(err, hash){
-          if(err){ return next(err);}
+    bcrypt.hash(user.password, salt, function (err, hash) {
+      if (err) {
+        return next(err)
+      }
 
-          user.password = hash;
-          next();
-      });
-   });
-});
+      user.password = hash
+      next()
+    })
+  })
+})
 
 //Every user have acces to this methods
-userSchema.methods.comparePassword = function(candidatePassword, callback){
-   bcrypt.compare(candidatePassword, this.password, function(err, isMatch){
-      if(err) {return callback(err);}
+userSchema.methods.comparePassword = function (candidatePassword, callback) {
+  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+    if (err) {
+      return callback(err)
+    }
 
-      callback(null, isMatch);
-   });
+    callback(null, isMatch)
+  })
 }
 
-
 userSchema.methods.generateJWT = function () {
-  return jwt.sign({
-    email: this.email,
-    id: this._id
-  }, config.JWT_SECRET, {expiresIn: '1h'})
+  return jwt.sign(
+    {
+      email: this.email,
+      id: this._id
+    },
+    config.JWT_SECRET,
+    { expiresIn: '1h' }
+  )
 }
 
 userSchema.methods.toAuthJSON = function () {
@@ -72,7 +87,7 @@ userSchema.methods.toAuthJSON = function () {
     email: this.email,
     joinedMeetups: this.joinedMeetups,
     token: this.generateJWT()
-  };
+  }
 }
 
-module.exports = mongoose.model('User', userSchema );
+module.exports = mongoose.model('User', userSchema)
