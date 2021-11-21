@@ -2,7 +2,8 @@
   <div v-if="isAuthResolved && isLocationResolved" id="app">
     <TheNavbar />
     <div class="page-wrapper">
-      <router-view />
+      <!-- This will change the page when state is stale -->
+      <router-view :key="$route.path" />
     </div>
     <TheFooter />
   </div>

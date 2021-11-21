@@ -21,6 +21,11 @@
               >
                 <span>Meetups in {{ meetups[0].location }}</span>
               </div>
+              <div v-if="category" class="level-item">
+                <button class="button is-danger" @click="cancelCategory">
+                  {{ category }} x
+                </button>
+              </div>
             </div>
             <div class="level-right">
               <div class="level-item">
@@ -32,7 +37,7 @@
         </div>
       </div>
     </div>
-    <div class="container">
+    <div v-if="pageLoader_isDataLoaded" class="container">
       <section class="section page-find">
         <div
           v-if="meetups && meetups.length > 0"
@@ -88,7 +93,16 @@
 </template>
 
 <script>
+import pageLoader from '@/mixins/pageLoader'
 export default {
+  mixins: [pageLoader],
+  props: {
+    category: {
+      required: false,
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       searchedLocation: this.$store.getters['meta/location'],
@@ -111,7 +125,22 @@ export default {
           .replace(/[\s,]+/g, '')
           .trim()
       }
-      this.$store.dispatch('meetups/fetchMeetups', { filter: this.filter })
+      if (this.category) {
+        this.filter['category'] = this.category
+      }
+      this.pageLoader_isDataLoaded = false
+      this.$store
+        .dispatch('meetups/fetchMeetups', { filter: this.filter })
+        .then(() => {
+          this.pageLoader_resolveData()
+        })
+        .catch((err) => {
+          this.pageLoader_resolveData()
+          console.log(err)
+        })
+    },
+    cancelCategory() {
+      this.$router.push({ name: 'PageMeetupFind' })
     }
   }
 }
@@ -147,6 +176,7 @@ export default {
   position: absolute;
   bottom: 0;
   left: 0;
+
   padding: 15px;
   width: 100%;
 }

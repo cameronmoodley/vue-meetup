@@ -65,7 +65,7 @@
               <!-- Threads Start -->
               <p class="menu-label">Threads</p>
               <ul>
-                <li v-for="thread in orderThreads" :key="thread._id">
+                <li v-for="thread in orderedThreads" :key="thread._id">
                   {{ thread.title }}
                 </li>
               </ul>
@@ -112,7 +112,18 @@
               />
             </div>
             <!-- Thread List START -->
-            <ThreadList :threads="orderThreads" :can-make-post="canMakePost" />
+            <ThreadList
+              :threads="orderedThreads"
+              :can-make-post="canMakePost"
+            />
+
+            <button
+              v-if="!isAllThreadsLoaded"
+              class="button is-primary"
+              @click="fetchThreadsHandler"
+            >
+              Show more threads
+            </button>
             <!-- Thread List END -->
           </div>
         </div>
@@ -129,6 +140,12 @@ export default {
   components: {
     ThreadCreateModal,
     ThreadList
+  },
+  data() {
+    return {
+      threadPageNumber: 1,
+      threadPageSize: 5
+    }
   },
   computed: {
     ...mapState({
@@ -154,17 +171,21 @@ export default {
     canMakePost() {
       return this.isAuthenticated && (this.isMeetupOwner || this.isMember)
     },
-    orderThreads() {
+    orderedThreads() {
       const copyOfThreads = [...this.threads]
+
       return copyOfThreads.sort((thread, nextThread) => {
         return new Date(nextThread.createdAt) - new Date(thread.createdAt)
       })
+    },
+    isAllThreadsLoaded() {
+      return this.$store.state.threads.isAllThreadsLoaded
     }
   },
   created() {
     const meetupId = this.$route.params.id
     this.fetchMeetupById(meetupId)
-    this.fetchThreads(meetupId)
+    this.fetchThreadsHandler({ meetupId, init: true })
 
     if (this.isAuthenticated) {
       this.$socket.emit('meetup/subscribe', meetupId)
@@ -178,6 +199,19 @@ export default {
   methods: {
     ...mapActions('meetups', ['fetchMeetupById']),
     ...mapActions('threads', ['fetchThreads', 'postThread', 'addPostToThread']),
+    fetchThreadsHandler({ meetupId, init }) {
+      const filter = {
+        pageNum: this.threadPageNumber,
+        pageSize: this.threadPageSize
+      }
+      this.fetchThreads({
+        meetupId: meetupId || this.meetup._id,
+        filter,
+        init
+      }).then(() => {
+        this.threadPageNumber++
+      })
+    },
     joinMeetup() {
       this.$store.dispatch('meetups/joinMeetup', this.meetup._id)
     },
