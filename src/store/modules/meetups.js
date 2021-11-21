@@ -67,11 +67,31 @@ export default {
           joinedPeople.slice(index, 1)
           commit('addUsersToMeetup', [...joinedPeople, joinedPeople])
         })
+    },
+    updateMeetup({ state, commit, rootState }, meetup) {
+      meetup.meetupCreator = rootState.auth.user
+      meetup.processedLocation = meetup.location
+        .toLowerCase()
+        .replace(/[\s,]+/g, '')
+        .trim()
+      return axiosInstance
+        .patch(`/api/v1/meetups/${meetup._id}`, meetup)
+        .then(({ data }) => {
+          data.processedLocation = data.location
+            .toLowerCase()
+            .replace(/[\s,]+/g, '')
+            .trim()
+          commit('mergeMeetup', data)
+          return state.item
+        })
     }
   },
   mutations: {
     addUsersToMeetup(state, joinedPeople) {
       Vue.set(state.item, 'joinedPeople', joinedPeople)
+    },
+    mergeMeetup(state, meetup) {
+      state.item = { ...state.item, ...meetup }
     }
   }
 }

@@ -1,29 +1,29 @@
 <template>
-  <div class="meetup-detail-page">
+  <div v-if="meetup && meetupCreator" class="meetup-detail-page">
     <section class="hero">
       <div class="hero-body">
         <div class="container">
           <h2 class="subtitle">
-            <!-- TODO: Display meetup start date -->
-            Some Date
+            {{ meetup.startDate | formatDate }}
           </h2>
           <div class="field">
-            <!-- TODO: Bind meetup title -->
-            Some Meetup Title
-            <input class="title input w-50" type="text" />
+            {{ meetup.title }}
+            <input
+              v-model="meetup.title"
+              class="title input w-50"
+              type="text"
+            />
           </div>
           <article class="media v-center">
             <figure class="media-left">
               <p class="image is-64x64">
-                <!-- TODO: Display meetup creator avatar -->
-                <img class="is-rounded" />
+                <img class="is-rounded" :src="meetupCreator.avatar" />
               </p>
             </figure>
             <div class="media-content">
               <div class="content">
                 <p>
-                  <!-- TODO: Display meetup creator name -->
-                  Created by <strong>Name Here</strong>
+                  Created by <strong>{{ meetupCreator.name }}</strong>
                 </p>
               </div>
             </div>
@@ -31,7 +31,12 @@
         </div>
         <div class="is-pulled-right">
           <!-- Update Button -->
-          <button class="button is-success is-large">Update</button>
+          <button
+            class="button is-success is-large"
+            @click.prevent="submitMeetupUpdates"
+          >
+            Update
+          </button>
         </div>
       </div>
     </section>
@@ -51,33 +56,71 @@
                   <!-- 2. Set Date on @input event-->
                   <!-- 3. Display actual meetup startDate in :value -->
                   <datepicker
-                    :value="new Date()"
+                    :value="meetup.startDate | formatDate"
                     :input-class="'input'"
+                    :disabled-dates="disabledDates"
+                    @input="setDate"
                   ></datepicker>
                   <div class="field m-t-md">
                     <!-- TODO: Implement @change Event -->
                     <!-- TODO: Bind timeFrom value with v-model -->
-                    <vue-timepicker :minute-interval="10"></vue-timepicker>
+                    <vue-timepicker
+                      v-model="meetup.timeFrom"
+                      :minute-interval="15"
+                      @change="changeTime($event, 'timeFrom')"
+                    ></vue-timepicker>
                   </div>
                   <div class="field">
                     <!-- TODO: Implement @change Event -->
                     <!-- TODO: Bind timeTo value with v-model -->
-                    <vue-timepicker :minute-interval="10"></vue-timepicker>
+                    <vue-timepicker
+                      v-model="meetup.timeTo"
+                      :minute-interval="15"
+                      @change="changeTime($event, 'timeTo')"
+                    ></vue-timepicker>
                   </div>
                   <!-- TIMES END -->
                 </div>
+
+                <div class="meetup-side-box-place m-b-sm">
+                  <p><b>Choose</b></p>
+                  <div class="field">
+                    <div class="select">
+                      <!-- TODO: Get Here Categories -->
+                      <select v-model="meetup.category">
+                        <option
+                          v-for="category of categories"
+                          :key="category.id"
+                          :value="category"
+                        >
+                          {{ category.name }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="meetup-side-box-place m-b-sm">
                   <p><b>How to find us</b></p>
                   <div class="field">
                     <!-- TODO: Bind meetup location -->
-                    <input class="input" type="text" />
+                    <input
+                      v-model="meetup.location"
+                      class="input"
+                      type="text"
+                    />
                   </div>
                 </div>
+
                 <div class="meetup-side-box-more-info">
                   <p><b>Additional Info</b></p>
                   <div class="field">
                     <!-- TODO: Bind meetup short info -->
-                    <textarea class="textarea" rows="5"></textarea>
+                    <textarea
+                      v-model="meetup.shortInfo"
+                      class="textarea"
+                      rows="5"
+                    ></textarea>
                   </div>
                 </div>
               </div>
@@ -94,7 +137,11 @@
             <div class="content is-medium">
               <h3 class="title is-3">About the Meetup</h3>
               <!-- TODO: Bind meetup description -->
-              <textarea class="textarea" rows="5"></textarea>
+              <textarea
+                v-model="meetup.description"
+                class="textarea"
+                rows="5"
+              ></textarea>
             </div>
           </div>
         </div>
@@ -120,28 +167,79 @@ export default {
       type: String
     }
   },
+  data() {
+    return {
+      disabledDates: {
+        customPredictor: function (date) {
+          const today = new Date()
+          const yesterday = today.setDate(today.getDate() - 1)
+          return date < yesterday
+        }
+      }
+    }
+  },
   computed: {
     meetup() {
-      return this.$store.state.meetups.item
+      const meetup = this.$store.state.meetups.item
+
+      if (this.hasValue(meetup)) {
+        const timeTo = this.parseTime(meetup.timeTo)
+        const timeFrom = this.parseTime(meetup.timeFrom)
+        return { ...meetup, timeTo, timeFrom }
+      }
+
+      return {}
+    },
+    categories() {
+      return this.$store.state.categories.items
     },
     meetupCreator() {
-      return this.meetup.meetupCreator
+      return this.meetup.meetupCreator || {}
     },
     authUser() {
-      return this.$store.state.auth.user
+      return this.$store.state.auth.user || {}
     }
   },
   created() {
+    this.fetchCategories()
     this.fetchMeetupByIdHandler()
   },
   methods: {
-    ...mapActions('meetups', ['fetchMeetupById']),
+    ...mapActions('meetups', ['fetchMeetupById', 'updateMeetup']),
+    ...mapActions('categories', ['fetchCategories']),
     fetchMeetupByIdHandler() {
       this.fetchMeetupById(this.meetupId)
         .then((meetup) => {
           if (meetup.meetupCreator._id !== this.authUser._id) {
             this.$router.push({ name: 'PageNotFound' })
           }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    },
+    parseTime(time) {
+      const [HH, mm] = time.split(':')
+      return { HH, mm }
+    },
+    setDate(date) {
+      this.meetup.startDate = moment(date).format()
+    },
+    changeTime({ data }, field) {
+      const minutes = data.mm || '00'
+      const hours = data.HH || '00'
+      this.meetup[field] = hours + ':' + minutes
+    },
+    hasValue(meetup) {
+      const meetupLen = Object.keys(meetup).length
+      return meetupLen && meetupLen > 0
+    },
+    submitMeetupUpdates() {
+      this.updateMeetup(this.meetup)
+        .then(() => {
+          this.$toasted.success('Meetup Succesfuly Updated!', {
+            duration: 3000
+          })
         })
         .catch((err) => {
           console.log(err)

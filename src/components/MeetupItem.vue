@@ -1,7 +1,7 @@
 <template>
   <div class="column is-one-third">
     <!-- <router-link :to="`/meetups/${meetup._id}`" class="card large"> -->
-    <div class="card large">
+    <div class="card is-hoverable large">
       <!-- this is better than the one above because it allows you to the URL -->
       <router-link
         :to="{ name: 'PageMeetupDetail', params: { id: meetup._id } }"
@@ -33,7 +33,9 @@
                 {{ meetup.title }}
               </p>
               <!-- meetup categort -->
-              <span class="tag is-success">{{ meetup.category.name }}</span>
+              <span class="tag is-success">{{
+                meetup.category.name | capitalize
+              }}</span>
               <!-- location -->
               <p class="subtitle is-7">
                 Tomorrow · {{ meetup.location }} · 05201
@@ -43,7 +45,7 @@
 
           <!-- description -->
           <div class="content">
-            {{ meetup.description }}
+            {{ meetup.shortInfo }}
             <div class="background-icon">
               <span class="icon-barcode"></span>
             </div>
@@ -67,5 +69,15 @@ export default {
 <style lang="css">
 .card-meetup-link {
   color: black;
+}
+
+.is-hoverable {
+  transition: 0.3s;
+}
+
+.is-hoverable:hover {
+  -webkit-box-shadow: 2px 4px 15px -2px rgba(189, 189, 189, 1);
+  -moz-box-shadow: 2px 4px 15px -2px rgba(189, 189, 189, 1);
+  box-shadow: 2px 4px 15px -2px rgba(189, 189, 189, 1);
 }
 </style>
