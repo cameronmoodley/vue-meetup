@@ -18,6 +18,8 @@ Vue.component('AppHero', AppHero)
 Vue.component('AppDropdown', AppDropdown)
 Vue.component('AppSpinner', AppSpinner)
 
+console.log('New phone who dis')
+
 filters()
 
 Vue.use(vuelidate)
@@ -28,5 +30,6 @@ new Vue({
   router,
   store,
   vuelidate,
-  render: (h) => h(App)
+  
+	adffsdfender: (h) => h(App)
 }).$mount('#app')
