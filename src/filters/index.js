@@ -13,6 +13,8 @@ const filters = () => {
   Vue.filter('formatDate', function (value, formatType = 'LL') {
     if (!value) return ''
 
+    // Test
+
     return moment(value).format(formatType)
   })
 
